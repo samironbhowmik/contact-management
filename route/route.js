@@ -45,8 +45,8 @@ route.get("/v1/contacts", async (req, res) => {
 //GET - Get a specific contact
 route.get("/v1/contacts/:id", async (req, res) => {
   try {
-    const { id } = req.params.id;
-    const contact = await userModel.findOne({ id: id });
+    console.log(req.params.id);
+    const contact = await userModel.findById(req.params.id);
 
     if (!contact) {
       return res.status(400).json({
@@ -56,7 +56,7 @@ route.get("/v1/contacts/:id", async (req, res) => {
     res.status(200).json({
       status: "success",
       // user,
-      contact,
+      contact
     });
   } catch (error) {
     res.status(400).json({
@@ -69,8 +69,8 @@ route.get("/v1/contacts/:id", async (req, res) => {
 //POST - Delete a specific contact
 route.delete("/v1/contacts/:id", async (req, res) => {
   try {
-    const { id } = req.params.id;
-    const contact = await userModel.findOneAndDelete({ id: id });
+    console.log(req.params.id);
+    const contact = await userModel.findByIdAndDelete(req.params.id);
     if(contact.contactCount ==0)
     {
         return res.status(400).json({
@@ -92,16 +92,21 @@ route.delete("/v1/contacts/:id", async (req, res) => {
 //PUT - Update a specific contact
 route.put("/v1/contacts/:id", async(req,res)=>{
     try {
-        const {id} = req.params.id;
-        const update = await userModel.findOneAndUpdate({id:id})
-        if(update == null)
-        {
-            return res.status(400).json({
-                status:"failed"
-            })
+        console.log(req.params.id);
+        const {firstname,lastname,email,phone,id}=req.body
+
+        const contact = {
+            firstname:firstname,
+            lastname:lastname,
+            email:email,
+            phone:phone,
+            id:req.params.id
         }
+        const update = await userModel.findByIdAndUpdate(req.params.id, contact, {new:true})
+        
         res.status(200).json({
             status:"success",
+            update
         })
     } catch (error) {
         res.status(400).json({
@@ -111,22 +116,20 @@ route.put("/v1/contacts/:id", async(req,res)=>{
     }
 })
 
-//PUT - Update a specific contact
+//PUT - Update a specific contact with partial data
 route.put("/v1/contacts/:id", async(req,res)=>{
     try {
-        const {id} = req.params.id;
-        const {firstname} = req.body
-        const contact = await userModel.findOneAndUpdate({firstname:firstname})
-        const update = await userModel.findOneAndUpdate({id:id})
-        if(update == null)
-        {
-            return res.status(400).json({
-                status:"failed"
-            })
+        console.log(req.params.id);
+        const {firstname}=req.body
+
+        const contact = {
+            firstname:firstname,
         }
+        const update = await userModel.findByIdAndUpdate(req.params.id, contact, {new:true})
+        
         res.status(200).json({
             status:"success",
-            contact
+            update
         })
     } catch (error) {
         res.status(400).json({
